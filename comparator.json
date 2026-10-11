@@ -23,7 +23,19 @@
     "ModalDepth.Contracts.parity_with_inputs",
     "ModalDepth.Contracts.depth_substitution_classification",
     "ModalDepth.Contracts.phase_substitution_classification",
-    "ModalDepth.Contracts.failed_depth_substitution"
+    "ModalDepth.Contracts.failed_depth_substitution",
+    "ModalDepth.Contracts.period_gcd",
+    "ModalDepth.Contracts.common_depth_substitution",
+    "ModalDepth.Contracts.positive_period_spectrum",
+    "ModalDepth.Contracts.admissible_label_inclusion",
+    "ModalDepth.Contracts.boxed_implication",
+    "ModalDepth.Contracts.boxed_inequivalence",
+    "ModalDepth.Contracts.phase_composition",
+    "ModalDepth.Contracts.depth_composition_classification",
+    "ModalDepth.Contracts.encoding_reflection",
+    "ModalDepth.Contracts.translation_sizes",
+    "ModalDepth.Contracts.uniform_transfer_no_overhead",
+    "ModalDepth.Contracts.coarse_composition_obstruction"
   ],
   "definition_names": [
     "ModalDepth.Formula.boxes",
@@ -47,7 +59,11 @@
     "ModalDepth.encode",
     "ModalDepth.decode",
     "ModalDepth.depthTranslate",
-    "ModalDepth.DepthSubstitution"
+    "ModalDepth.DepthSubstitution",
+    "ModalDepth.SuccessorCompatible",
+    "ModalDepth.DepthCompositionClosed",
+    "ModalDepth.Formula.nodeCount",
+    "ModalDepth.Formula.modalDepth"
   ],
   "permitted_axioms": [
     "propext",

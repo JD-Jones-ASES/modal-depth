@@ -17,7 +17,7 @@ import subprocess
 import sys
 
 
-HEADER = """import ModalDepth.NegativeControls
+HEADER = """import ModalDepth
 open ModalDepth ModalDepth.NegativeControls
 """
 
@@ -35,9 +35,50 @@ example : ¬ DepthSubstitution 1 (fun d => d % 2) ℕ Empty :=
   parity_GL_substitution_fails
 example : DepthSubstitution 2 (fun d => d % 2) ℕ Empty :=
   parity_two_substitution
+example : Provable 3 (.imp ((Formula.atom (0 : ℕ)).boxes 2)
+    ((Formula.atom 0).boxes 5)) :=
+  (boxes_atom_imp_iff_arithmetic 3 (by decide) 2 5 0).mpr
+    (Or.inr ⟨by decide, by decide, by decide⟩)
+example : ¬ Provable 3 (.imp ((Formula.atom (0 : ℕ)).boxes 2)
+    ((Formula.atom 0).boxes 4)) := by
+  intro h
+  have hbad := (boxes_atom_imp_iff_arithmetic 3 (by decide) 2 4 0).mp h
+  norm_num at hbad
+example : ¬ DepthCompositionClosed CompositionBoundary.coarseLabel ℕ ℕ PEmpty := by
+  intro h
+  exact CompositionBoundary.no_single_coarse_substitution
+    (h CompositionBoundary.insertBox CompositionBoundary.selectTruth)
 """
 
 CONTROLS = [
+    (
+        "dropped_box_order",
+        "Try to reverse a valid same-residue box implication by dropping the order condition.",
+        """example : Provable 3 (.imp ((Formula.atom (0 : ℕ)).boxes 5)
+    ((Formula.atom 0).boxes 2)) := by
+  apply (boxes_atom_imp_iff 3 (by decide) 5 2 0).mpr
+  exact ⟨by decide, by decide⟩
+""",
+        "is false",
+    ),
+    (
+        "dropped_root_restriction",
+        "Treat the root as an ordinary positive residue in the box implication criterion.",
+        """example : Provable 3 (.imp (Formula.atom (0 : ℕ))
+    ((Formula.atom 0).boxes 3)) := by
+  apply (boxes_atom_imp_iff_arithmetic 3 (by decide) 0 3 0).mpr
+  exact Or.inr ⟨by decide, by decide, by decide⟩
+""",
+        "is false",
+    ),
+    (
+        "periodicity_implies_composition",
+        "Use admissible periodicity where composition requires successor compatibility.",
+        """example : DepthCompositionClosed CompositionBoundary.coarseLabel ℕ ℕ PEmpty := by
+  exact depthCompositionClosed_of_compatible CompositionBoundary.coarseLabel_periodic
+""",
+        "Application type mismatch",
+    ),
     (
         "wrong_substitution_period",
         "Replace the valid period-two substitution result with a period-one claim.",
@@ -101,6 +142,12 @@ def run(command: list[str], root: Path) -> subprocess.CompletedProcess[str]:
 
 
 def main() -> int:
+    root = Path(__file__).resolve().parents[1]
+    output = root / ".lake" / "verification"
+    output.mkdir(parents=True, exist_ok=True)
+    # Even an early compiler/setup failure must invalidate a previous success.
+    (output / "negative-controls.json").unlink(missing_ok=True)
+
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--lake", default=shutil.which("lake"))
     args = parser.parse_args()
@@ -108,11 +155,8 @@ def main() -> int:
         print("ERROR: lake is not on PATH; provide --lake PATH", file=sys.stderr)
         return 2
 
-    root = Path(__file__).resolve().parents[1]
-    output = root / ".lake" / "verification"
-    output.mkdir(parents=True, exist_ok=True)
     try:
-        build = run([args.lake, "build", "ModalDepth.NegativeControls"], root)
+        build = run([args.lake, "build", "ModalDepth"], root)
         (output / "negative-build.log").write_text(build.stdout, encoding="utf-8")
         if build.returncode != 0:
             print("ERROR: positive control module failed to build", file=sys.stderr)

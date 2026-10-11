@@ -51,6 +51,8 @@ jobs:
           use-mathlib-cache: true
       - name: Check proof sources and theorem contracts
         run: python3 scripts/check_sources.py
+      - name: Reject stale success reports after verification failures
+        run: python3 scripts/check_verification_failures.py
       - name: Build the complete formal package
         run: |
           mkdir -p .lake/verification

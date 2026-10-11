@@ -60,6 +60,30 @@ raised in the conclusion of [Sierra Miranda and Studer's 2026 paper](https://arx
 It determines all admissible depth labelings and supplies an explicit failed
 substitution whenever positive-depth periodicity is violated.
 
+## Further exact results
+
+[Extensions.md](Extensions.md) develops four applications of the classification:
+
+- **Parameter spectrum.** A labeling with least positive-depth period $`p`$
+  permits all substitutions in exactly the logics with $`p\mid n`$.
+  A labeling works separately for parameters $`a,b>0`$ exactly when it has
+  positive-depth period $`\gcd(a,b)`$.
+- **Boxed-atom implications.** For $`n>0`$,
+  $`\mathsf{wGL}_n\vdash\Box^k p\to\Box^\ell p`$ exactly when
+  $`k=\ell`$, or $`0<k\le\ell`$ and $`n\mid(\ell-k)`$.
+  Different box depths remain pairwise inequivalent.
+- **Composition.** Phase-controlled substitutions compose. For arbitrary
+  labels, all successive substitutions can be represented by one substitution
+  with the same labels exactly when equal labels have equal successor labels.
+  Positive periodicity alone does not guarantee this. An explicit admissible
+  period-two scheme fails even to represent a particular composite up to
+  agreement on theoremhood.
+- **Interpolation transfer.** Encoding preserves and reflects theoremhood.
+  Encoding and decoding preserve syntax-tree node count and modal depth exactly.
+  A given ordinary source-supported uniform interpolant therefore transfers
+  with no additional nodes or boxes. An ordinary interpolation algorithm
+  remains an external input.
+
 Read [Proof.md](Proof.md) for the definitions, proof, and mathematical references.
 The ordinary inputs are [Sierra Miranda and Studer, Theorem 5.9](https://arxiv.org/pdf/2607.06359v1),
 [Iwata, Theorem 12.7](https://da.lib.kobe-u.ac.jp/da/kernel/D1007785/D1007785.pdf)
@@ -76,11 +100,13 @@ lake build
 python3 scripts/check_sources.py
 python3 scripts/audit_axioms.py
 python3 scripts/check_negative_controls.py
+python3 scripts/check_verification_failures.py
 ```
 
 [Verification.md](Verification.md) describes the proof contracts, negative
 controls, and Linux kernel-replay scripts. The mathematical implementation is in
 `ModalDepth/`: `Basic`, `Interpolation`, `Phase`, `Renaming`, `Periodic`,
-`Obstruction`, `Transfer`, `Craig`, and `Substitution`.
+`Obstruction`, `Transfer`, `Craig`, `Substitution`, `PeriodSpectrum`,
+`BoxSpectrum`, `Composition`, and `Algorithmic`.
 
 MIT license. Copyright (c) 2026 JD Jones.

@@ -39,6 +39,12 @@ def require_clean_candidate(root: Path = ROOT) -> str:
 
 
 def main() -> None:
+    work = ROOT / ".lake/verification"
+    work.mkdir(parents=True, exist_ok=True)
+    record_path = work / "kernels.json"
+    # Invalidate previous success before platform, checkout, or tool checks.
+    record_path.unlink(missing_ok=True)
+
     if platform.system() != "Linux":
         raise SystemExit("Comparator and the independent-kernel run require Linux")
     toolchain = (ROOT / "lean-toolchain").read_text().strip()
@@ -50,8 +56,6 @@ def main() -> None:
              ("lake", "lean", "leanexport", "leanchecker", "nanoda_bin", "con-ron")}
     if any(not path.is_file() or not os.access(path, os.X_OK) for path in tools.values()):
         raise SystemExit("The selected release lacks a required bundled checker")
-    work = ROOT / ".lake/verification"
-    work.mkdir(parents=True, exist_ok=True)
     config = json.loads((ROOT / "comparator.json").read_text())
     config.pop("enable_nanoda", None)
     config["external_kernels"] = {
@@ -68,7 +72,6 @@ def main() -> None:
     bwrap = os.environ.get("COMPARATOR_BWRAP")
     if bwrap:
         record["bwrap_sha256"] = digest(Path(bwrap))
-    record_path = work / "kernels.json"
     record_path.write_text(json.dumps(record, indent=2) + "\n")
     command = [str(tools["lake"]), "comparator", "--config", str(path)]
     record["command"] = command

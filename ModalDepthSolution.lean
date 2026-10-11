@@ -5,7 +5,7 @@ public import ModalDepth
 @[expose] public section
 
 namespace ModalDepth.Contracts
-variable {α β Q C : Type}
+variable {α β χ Q C : Type}
 
 theorem uniform_classification (n : ℕ) (hn : 0 < n) (c : ℕ → C) :
     UniformSigned n c ℕ ↔ SourceULI n ℕ ∧ PositivePeriodic n c := by
@@ -116,5 +116,85 @@ theorem failed_depth_substitution (n k : ℕ) (hn : 0 < n) (hk : 0 < k)
       ¬ Provable n (depthTranslate c f 0
         (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes (k + n)))) := by
   exact depthTranslate_failure hn hk hc p
+
+theorem period_gcd (a b : ℕ) (c : ℕ → C) :
+    PositivePeriodic a c ∧ PositivePeriodic b c ↔
+      PositivePeriodic (Nat.gcd a b) c := by
+  exact positivePeriodic_gcd_iff a b c
+
+theorem common_depth_substitution (a b : ℕ) (ha : 0 < a) (hb : 0 < b)
+    (c : ℕ → C) [Nonempty α] :
+    DepthSubstitution a c α β ∧ DepthSubstitution b c α β ↔
+      PositivePeriodic (Nat.gcd a b) c := by
+  exact depthSubstitution_pair_iff a b ha hb c
+
+theorem positive_period_spectrum (c : ℕ → C)
+    (h : ∃ p : ℕ, 0 < p ∧ PositivePeriodic p c) :
+    ∃ p : ℕ, 0 < p ∧ ∀ n : ℕ, PositivePeriodic n c ↔ p ∣ n := by
+  exact positivePeriodic_spectrum c h
+
+theorem admissible_label_inclusion (a b : ℕ) (ha : 0 < a) (hb : 0 < b) :
+    (∀ c : ℕ → ℕ, PositivePeriodic a c → PositivePeriodic b c) ↔ a ∣ b := by
+  exact positivePeriodic_inclusion_iff a b ha hb
+
+theorem boxed_implication (n : ℕ) (hn : 0 < n) (k l : ℕ) (p : α) :
+    Provable n (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes l)) ↔
+      k = l ∨ (0 < k ∧ k ≤ l ∧ n ∣ l - k) := by
+  exact boxes_atom_imp_iff_arithmetic n hn k l p
+
+theorem boxed_inequivalence (n : ℕ) (hn : 0 < n) (k l : ℕ) (p : α) :
+    (Provable n (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes l)) ∧
+      Provable n (.imp ((Formula.atom p).boxes l) ((Formula.atom p).boxes k))) ↔ k = l := by
+  exact boxes_atom_mutual_iff n hn k l p
+
+theorem phase_composition (δ : Q → Q)
+    (f : Q → α → Formula β) (g : Q → β → Formula χ) (q : Q) (A : Formula α) :
+    phaseTranslate δ g q (phaseTranslate δ f q A) =
+      phaseTranslate δ (fun r p => phaseTranslate δ g r (f r p)) q A := by
+  exact phaseTranslate_compose δ f g q A
+
+theorem depth_composition_classification (c : ℕ → C) [Nonempty α] [Nonempty β] :
+    DepthCompositionClosed c α β χ ↔ SuccessorCompatible c := by
+  exact depthCompositionClosed_iff c
+
+theorem encoding_reflection (δ : Q → Q) (n : ℕ)
+    (hδ : ∀ q, δ^[n + 1] q = δ q) (q : Q) (A : Formula α) :
+    Provable n (encode δ q A) ↔ Provable n A := by
+  exact encode_provable_iff δ hδ q A
+
+theorem translation_sizes (δ : Q → Q) (q : Q) (A : Formula α)
+    (J : Formula (α × Q)) :
+    (encode δ q A).nodeCount = A.nodeCount ∧
+    (encode δ q A).modalDepth = A.modalDepth ∧
+    (decode δ q J).nodeCount = J.nodeCount ∧
+    (decode δ q J).modalDepth = J.modalDepth := by
+  exact ⟨encode_nodeCount δ q A, encode_modalDepth δ q A,
+    decode_nodeCount δ q J, decode_modalDepth δ q J⟩
+
+theorem uniform_transfer_no_overhead (δ : Q → Q) (q : Q) (n : ℕ)
+    (hδ : ∀ q, δ^[n + 1] q = δ q)
+    (A : Formula α) (W : Bool → α → Q → Prop) (J : Formula (α × Q))
+    (hs : ∀ s p, J.vocab s p → (encode δ q A).vocab s p ∧ W s p.1 p.2)
+    (hAJ : Provable n (.imp (encode δ q A) J))
+    (hU : ∀ B : Formula (α × Q), (∀ s p, B.vocab s p → W s p.1 p.2) →
+      Provable n (.imp (encode δ q A) B) → Provable n (.imp J B)) :
+    ∃ I : Formula α,
+      (∀ s p z, I.support (fun d => δ^[d] q) s p z →
+        A.support (fun d => δ^[d] q) s p z ∧ W s p z) ∧
+      Provable n (.imp A I) ∧
+      (∀ B : Formula α, (∀ s p z, B.support (fun d => δ^[d] q) s p z → W s p z) →
+        Provable n (.imp A B) → Provable n (.imp I B)) ∧
+      I.nodeCount = J.nodeCount ∧ I.modalDepth = J.modalDepth := by
+  exact decode_uniformInterpolant δ q hδ A W J hs hAJ hU
+
+theorem coarse_composition_obstruction :
+    ∃ (c : ℕ → ℕ) (f : ℕ → ℕ → Formula ℕ) (g : ℕ → ℕ → Formula PEmpty),
+      PositivePeriodic 2 c ∧
+      ¬ ∃ h : ℕ → ℕ → Formula PEmpty, ∀ A : Formula ℕ,
+        Provable 2 (depthTranslate c h 0 A) ↔
+          Provable 2 (depthTranslate c g 0 (depthTranslate c f 0 A)) := by
+  exact ⟨CompositionBoundary.coarseLabel, CompositionBoundary.insertBox,
+    CompositionBoundary.selectTruth, CompositionBoundary.coarseLabel_periodic,
+    CompositionBoundary.no_theoremhood_equivalent_coarse_substitution⟩
 
 end ModalDepth.Contracts

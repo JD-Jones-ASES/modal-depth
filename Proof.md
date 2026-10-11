@@ -260,3 +260,9 @@ It does not formalize these external ordinary interpolation theorems.
 `classification_from_ordinary` therefore keeps `OrdinaryULI` and
 `OrdinaryLyndon` as explicit hypotheses; applying the cited mathematical
 results gives the positive existence corollary outside that formal boundary.
+
+[Extensions.md](Extensions.md) gives the subsequent period spectrum, exact
+boxed-atom implication criterion, substitution composition classification,
+and syntax-size-preserving interpolation transfer. Its final section records
+the bridge between the different ordinary-interpolation vocabulary conventions
+used in the cited sources.

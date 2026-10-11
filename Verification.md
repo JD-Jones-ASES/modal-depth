@@ -33,10 +33,11 @@ lake build
 python3 scripts/check_sources.py
 python3 scripts/audit_axioms.py
 python3 scripts/check_negative_controls.py
+python3 scripts/check_verification_failures.py
 ```
 
-[The comparison configuration](comparator.json) lists 22 theorem contracts
-and 22 definition contracts. `ModalDepthChallenge.lean` is an independent
+[The comparison configuration](comparator.json) lists 34 theorem contracts
+and 26 definition contracts. `ModalDepthChallenge.lean` is an independent
 statement fixture with proof placeholders; `ModalDepthSolution.lean` imports
 the proved implementation and supplies every contract. The implementation
 never imports the challenge fixture. Placeholder axioms are forbidden in the
@@ -44,13 +45,32 @@ solution and supporting proofs.
 
 The axiom audit inspects the compiled environment, including nested
 namespaces, and checks all supporting theorems. The boundary controls prove
-concrete counterexamples and require six corrupted proof attempts to fail
+concrete counterexamples and require nine corrupted proof attempts to fail
 with their intended diagnostics. They cover blind color erasure, an
 inadmissible phase action, a false phase identity, root/cycle collapse,
-an incompatible residue modulus, and the wrong period for depth substitution.
+an incompatible residue modulus, the wrong period for depth substitution,
+reversed box-depth order, a missing root restriction, and confusing
+positive periodicity with substitution composition closure.
 The accepted baseline also exercises substitution into an empty target alphabet.
 These are targeted controls, not exhaustive
 mutation testing.
+
+The additional compared contracts cover common periods, the least-period
+spectrum, admissible-label inclusion, exact boxed-atom implications and
+inequivalence, phase composition, the composition criterion for arbitrary
+coarsened labels, encoding reflection, syntax-tree metrics, and transfer of
+an interpolant without size overhead. A period-two composition obstruction
+is compared even at the level of agreement on output theoremhood. New
+definitions for composition and syntax-tree metrics are compared as well.
+
+Each verification script invalidates its prior JSON success summary before
+starting checks. An early setup, compiler, platform, or checkout failure can
+therefore no longer leave an earlier successful summary in place.
+`check_verification_failures.py` exercises eight such failures in isolated
+temporary copies, including a missing compiler, failed build, failed positive
+baseline, wrong platform or toolchain, dirty checkout, and missing kernel
+checker. It checks the failure diagnostics and removal of the old summary;
+these regression checks do not run Lean or substitute for the actual replay.
 
 All Lean sources use explicit module visibility and expose the definitions
 needed by the public interfaces. The source check also enforces module headers,
