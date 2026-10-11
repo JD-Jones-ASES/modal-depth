@@ -1,0 +1,123 @@
+name: Verify exact modal-depth commit
+
+on:
+  push:
+    branches: [codex/formalization]
+  workflow_dispatch:
+    inputs:
+      expected_sha:
+        description: Full 40-character commit selected for verification
+        required: true
+        type: string
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+concurrency:
+  group: modal-depth-verification-${{ github.sha }}
+  cancel-in-progress: false
+
+env:
+  LEAN_NUM_THREADS: 2
+  LEAN_ABORT_ON_PANIC: 1
+
+jobs:
+  formal-verification:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Confirm exact candidate
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$GITHUB_SHA" = "$EXPECTED_SHA"
+          git rev-parse HEAD
+      - name: Install pinned Lean and retrieve pinned Mathlib cache
+        uses: leanprover/lean-action@f061402b660e0c34644504b324e830f2991d4865 # v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: true
+      - name: Check proof sources and theorem contracts
+        run: python3 scripts/check_sources.py
+      - name: Build the complete formal package
+        run: |
+          mkdir -p .lake/verification
+          lake build 2>&1 | tee .lake/verification/build.log
+      - name: Audit principal and supporting theorem axioms
+        run: python3 scripts/audit_axioms.py
+      - name: Check semantic counterexamples and reject corrupted proofs
+        run: python3 scripts/check_negative_controls.py
+      - name: Install the official pinned sandbox
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y meson ninja-build pkg-config libcap-dev apparmor
+          curl --fail --location --silent --show-error \
+            https://raw.githubusercontent.com/PalomarRegistry/PalomarSubmission/d4e41c1d5b0d114c4859e6e5831dc6d3ad1d0d44/scripts/install_bwrap.sh \
+            --output "$RUNNER_TEMP/modal-depth-install-bwrap.sh"
+          bash "$RUNNER_TEMP/modal-depth-install-bwrap.sh" "$RUNNER_TEMP/modal-depth-bwrap" > "$RUNNER_TEMP/modal-depth-bwrap-path"
+          printf 'COMPARATOR_BWRAP=%s\n' "$(cat "$RUNNER_TEMP/modal-depth-bwrap-path")" >> "$GITHUB_ENV"
+      - name: Compare statements and replay Lean, NanoDa and con-ron
+        run: python3 scripts/verify_kernels.py
+      - name: Confirm tracked sources remained unchanged
+        run: git diff --exit-code
+      - name: Save exact-commit verification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: formal-verification-${{ github.sha }}
+          path: .lake/verification/
+          if-no-files-found: error
+          retention-days: 30
+
+  fresh-project-build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Confirm exact candidate and fresh project state
+        env:
+          EXPECTED_SHA: ${{ inputs.expected_sha || github.sha }}
+        run: |
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SHA"
+          test "$GITHUB_SHA" = "$EXPECTED_SHA"
+          test ! -e .lake/build
+      - uses: leanprover/lean-action@f061402b660e0c34644504b324e830f2991d4865 # v1
+        with:
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+          use-github-cache: false
+          use-mathlib-cache: true
+      - name: Rebuild all project sources on a separate fresh runner
+        run: |
+          test ! -e .lake/build/lib/lean/ModalDepthSolution.olean
+          mkdir -p .lake/verification
+          git rev-parse HEAD > .lake/verification/candidate-sha.txt
+          lake env lean --version > .lake/verification/lean-version.txt
+          python3 scripts/check_sources.py
+          lake build 2>&1 | tee .lake/verification/fresh-build.log
+          python3 scripts/audit_axioms.py
+          git diff --exit-code
+      - name: Save fresh-build evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: fresh-project-build-${{ github.sha }}
+          path: .lake/verification/
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,52 @@
+{
+  "challenge_module": "ModalDepthChallenge",
+  "solution_module": "ModalDepthSolution",
+  "theorem_names": [
+    "ModalDepth.Contracts.uniform_classification",
+    "ModalDepth.Contracts.signed_classification",
+    "ModalDepth.Contracts.unsigned_classification",
+    "ModalDepth.Contracts.classification_given_inputs",
+    "ModalDepth.Contracts.residue_uniform",
+    "ModalDepth.Contracts.residue_signed",
+    "ModalDepth.Contracts.residue_unsigned",
+    "ModalDepth.Contracts.canonical_partition",
+    "ModalDepth.Contracts.finite_labels",
+    "ModalDepth.Contracts.positive_transitivity",
+    "ModalDepth.Contracts.unsigned_necessity",
+    "ModalDepth.Contracts.exact_depth_obstruction",
+    "ModalDepth.Contracts.incompatible_modulus",
+    "ModalDepth.Contracts.source_normalization",
+    "ModalDepth.Contracts.phase_preservation",
+    "ModalDepth.Contracts.decode_roundtrip",
+    "ModalDepth.Contracts.encoding_support",
+    "ModalDepth.Contracts.decoding_support",
+    "ModalDepth.Contracts.parity_with_inputs"
+  ],
+  "definition_names": [
+    "ModalDepth.Formula.boxes",
+    "ModalDepth.Formula.conj",
+    "ModalDepth.Formula.Occurs",
+    "ModalDepth.Formula.vocab",
+    "ModalDepth.Formula.support",
+    "ModalDepth.Formula.unsigned",
+    "ModalDepth.Formula.unsignedVocab",
+    "ModalDepth.PropForm.eval",
+    "ModalDepth.PropForm.subst",
+    "ModalDepth.OrdinaryULI",
+    "ModalDepth.OrdinaryLyndon",
+    "ModalDepth.OrdinaryCraig",
+    "ModalDepth.SourceULI",
+    "ModalDepth.UniformSigned",
+    "ModalDepth.SignedCraig",
+    "ModalDepth.UnsignedCraig",
+    "ModalDepth.PositivePeriodic",
+    "ModalDepth.phaseTranslate",
+    "ModalDepth.encode",
+    "ModalDepth.decode"
+  ],
+  "permitted_axioms": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound"
+  ]
+}
