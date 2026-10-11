@@ -70,7 +70,7 @@ substitution whenever positive-depth periodicity is violated.
   positive-depth period $`\gcd(a,b)`$.
 - **Boxed-atom implications.** For $`n>0`$,
   $`\mathsf{wGL}_n\vdash\Box^k p\to\Box^\ell p`$ exactly when
-  $`k=\ell`$, or $`0<k\le\ell`$ and $`n\mid(\ell-k)`$.
+  $`k=\ell`$, or $`0\lt k\le\ell`$ and $`n\mid(\ell-k)`$.
   Different box depths remain pairwise inequivalent.
 - **Composition.** Phase-controlled substitutions compose. For arbitrary
   labels, all successive substitutions can be represented by one substitution

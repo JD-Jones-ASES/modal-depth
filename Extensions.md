@@ -73,7 +73,7 @@ For $`n>0`$, a source atom $`p`$, and arbitrary depths $`k,\ell\ge0`$,
 ```math
 \mathsf{wGL}_n\vdash\Box^k p\to\Box^\ell p
 \quad\Longleftrightarrow\quad
-k=\ell\ \lor\ \bigl(0<k\le\ell\ \land\ n\mid(\ell-k)\bigr).
+k=\ell\ \lor\ \bigl(0\lt k\le\ell\ \land\ n\mid(\ell-k)\bigr).
 ```
 
 Equivalently, $`k\le\ell`$ and the canonical labels of $`k`$ and $`\ell`$ agree.

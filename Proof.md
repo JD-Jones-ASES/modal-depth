@@ -147,7 +147,7 @@ remain distinct from depth zero.
 A labeling $`c`$ factors through $`\gamma`$ if and only if $`P_n(c)`$ holds.
 For the forward direction, the orbit is periodic at positive depths.
 For the reverse direction define $`h(\ast)=c(0)`$ and $`h(i)=c(i+1)`$ for
-$`0\le i<n`$. Repeated use of $`P_n(c)`$ gives
+$`0\le i\lt n`$. Repeated use of $`P_n(c)`$ gives
 $`c(k+1)=c((k\bmod n)+1)`$, hence $`c=h\circ\gamma`$.
 This is `canonical_factor_iff`.
 
