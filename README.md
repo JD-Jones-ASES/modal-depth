@@ -93,9 +93,13 @@ for $`n=1`$.
 ## Build and verification
 
 The Lean toolchain and mathlib revision are pinned in `lean-toolchain` and
-`lake-manifest.json`.
+`lake-manifest.json`. [formalization.yaml](formalization.yaml) records the
+mathematical scope, provenance, literature inputs, authorship, and AI assistance.
+The metadata check uses the [pinned official v0.4 schema](verification/README.md).
 
 ```sh
+python3 -m pip install -r verification/requirements.txt
+python3 scripts/validate_metadata.py
 lake build
 python3 scripts/check_sources.py
 python3 scripts/audit_axioms.py

@@ -1,0 +1,162 @@
+version: v0.4
+project:
+  name: Depth-labeled interpolation and substitution in Sacchetti's modal logics
+  description: >-
+    Classifies depth labelings in the modal logics wGL_n for positive n.
+    Every simultaneous formula-valued substitution indexed by atom and depth
+    label preserves theoremhood exactly when the labels satisfy
+    c(k+n)=c(k) at every positive depth k. The interpolation equivalences
+    identify the corresponding labeled property with its ordinary
+    interpolation property and the same periodicity condition; the ordinary
+    interpolation theorems remain explicit inputs. Further results classify
+    period spectra, boxed-atom implications and composition of depth
+    substitutions, and transfer a supplied ordinary interpolant while
+    preserving syntax-tree node count and modal depth.
+  authors: [JD Jones]
+  responsible_maintainers: [JD Jones]
+  license: MIT
+classification:
+  arxiv: [math.LO]
+  msc2020: [03B45, 03F45]
+sources:
+  - title: Depth-labeled interpolation and substitution in Sacchetti's modal logics
+    type: original-proof
+    authors: [JD Jones]
+    relationship: other
+    note: >-
+      This formalization first presents the classification and extension
+      results as original work of this project. Proof.md and Extensions.md
+      are accompanying accounts of the same development, not distinct prior
+      source works being formalized. The cited ordinary interpolation
+      theorems and prior depth-residue techniques are credited separately.
+      Original-proof describes provenance and does not assert worldwide
+      priority or independent human specialist review.
+  - title: Proof Theory and Interpolation for Sacchetti's Logics
+    authors: [Borja Sierra Miranda, Thomas Studer]
+    id: https://arxiv.org/abs/2607.06359v1
+    type: paper
+    location: Definition 2.5, Theorem 5.9, and conclusion
+    relationship: background
+    note: >-
+      Motivates tracking depth in interpolation vocabularies and supplies
+      ordinary uniform Lyndon interpolation in the literature. Its proof is
+      not formalized here. OrdinaryULI remains an explicit hypothesis of
+      classification_given_inputs and is not a new axiom.
+  - title: Some results on modal logics having arithmetical interpretations
+    authors: [Sohei Iwata]
+    id: https://hdl.handle.net/20.500.14094/D1007785
+    type: other
+    location: Theorem 12.7
+    relationship: background
+    note: >-
+      Doctoral thesis. Supplies ordinary Lyndon interpolation for n at least 2 in the
+      literature and already distinguishes unmodalized and modalized
+      literals. This external theorem is not proved by the package;
+      OrdinaryLyndon remains an explicit hypothesis where needed.
+  - title: Uniform Lyndon interpolation property in propositional modal logics
+    authors: [Taishi Kurahashi]
+    id: https://arxiv.org/abs/1809.00943v3
+    type: paper
+    location: Definition 2.7, Proposition 2.9, and Theorem 5.2
+    relationship: background
+    note: >-
+      Supplies the ordinary interpolation inputs for GL, the case n=1,
+      in the literature. These proofs are not formalized here. Extensions.md
+      explains the finite-forbidden versus arbitrary-permitted vocabulary
+      conventions used to connect the published and formal statements.
+  - title: Effectively constructible fixed points in Sacchetti's modal logics of provability
+    authors: [Taishi Kurahashi, Yuya Okawa]
+    id: https://arxiv.org/abs/1811.12827v2
+    type: paper
+    location: Definition 4.7, Lemma 4.8, and Examples 5.1-5.2
+    relationship: background
+    note: >-
+      Prior depth-residue substitution techniques for fixed-point
+      construction. The present result classifies arbitrary simultaneous
+      formula-valued substitutions and their exact necessary period;
+      it does not claim to originate depth-residue manipulations.
+automation:
+  methods:
+    - method: agent
+      models: [GPT-6, GPT-6 Pro]
+      framework: OpenAI Codex
+      tool_setup: OpenAI Codex and OpenAI GPT-6 Pro mathematical assistance
+      prompting_notes: >-
+        Agents developed and reviewed mathematical arguments, Lean proofs,
+        documentation, and verification under JD Jones's direction.
+  notes: >-
+    Disclosure.md records authorship and AI assistance. Tactics produce
+    proof terms checked by Lean. Comparator checks the formal contracts,
+    and the Linux verification workflow replays the solution closure with
+    Lean, NanoDa, and con-ron. No custom axiom or external interpolation
+    theorem is installed as a proof oracle.
+review:
+  status: agent-reviewed
+  notes: >-
+    Internal agent review and mechanical verification address theorem
+    scope, proof contracts, allowed axioms, and targeted negative controls.
+    No independent human specialist peer review or worldwide priority
+    determination is claimed. Exact-commit evidence is described in
+    Verification.md; verification is distinct from Palomar registration.
+status:
+  scope: >-
+    The proved structural equivalences preserve ordinary interpolation
+    properties on their right-hand sides. Positive interpolation existence
+    after removing those properties is conditional on the published
+    ordinary interpolation inputs. Substitution and composition
+    classifications do not require interpolation hypotheses.
+  sorry_count: 0
+  sorry_in_definitions: 0
+  axioms: [propext, Classical.choice, Quot.sound]
+  main_results:
+    - declaration: ModalDepth.Contracts.uniform_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.signed_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.unsigned_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.classification_given_inputs
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+      literature_dependencies:
+        - statement: >-
+            OrdinaryULI n Nat for positive n, retained as an explicit
+            theorem hypothesis rather than proved in this package.
+          source: Proof Theory and Interpolation for Sacchetti's Logics
+        - statement: >-
+            OrdinaryLyndon n Nat for n at least 2, retained as an explicit
+            theorem hypothesis rather than proved in this package.
+          source: Some results on modal logics having arithmetical interpretations
+        - statement: >-
+            Ordinary uniform and Lyndon interpolation for GL, the case n=1;
+            these are external inputs, not formalized theorems of this package.
+          source: Uniform Lyndon interpolation property in propositional modal logics
+    - declaration: ModalDepth.Contracts.depth_substitution_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.phase_substitution_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.depth_composition_classification
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.boxed_implication
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+    - declaration: ModalDepth.Contracts.uniform_transfer_no_overhead
+      file: ModalDepthSolution.lean
+      comparator_config: comparator.json
+fidelity:
+  divergences: >-
+    For positive n, interpolation classifications are stated over natural-number
+    atoms and arbitrary label types. Depth-substitution classification requires
+    a nonempty source atom type and permits an arbitrary target atom type,
+    including an empty one. Composition classification requires nonempty
+    source and intermediate atom types and an arbitrary final atom type.
+    Periodicity constrains positive depths only, leaving the root label free.
+    The transfer theorem takes a supplied ordinary interpolant; it does not
+    implement an interpolation algorithm. Its node-count and modal-depth
+    equalities are not bounds on proof size, name bit encoding, or runtime.

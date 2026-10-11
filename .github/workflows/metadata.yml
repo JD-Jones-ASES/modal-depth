@@ -1,0 +1,50 @@
+name: Validate Palomar metadata
+
+on:
+  push:
+    paths: ['formalization.yaml', '.github/workflows/metadata.yml']
+  pull_request:
+    paths: ['formalization.yaml', '.github/workflows/metadata.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Read the pinned official Palomar contract
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: PalomarRegistry/PalomarSubmission
+          ref: d4e41c1d5b0d114c4859e6e5831dc6d3ad1d0d44
+          path: _palomar-metadata-contract
+          persist-credentials: false
+      - name: Read the pinned upstream metadata schema
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          repository: mathlib-initiative/formalization.yaml
+          ref: 99c678e569c7c4c0772db297c5ddd5e4c9b6322e
+          path: _formalization-schema
+          persist-credentials: false
+      - name: Validate schema, required fields, and normalized provenance
+        env:
+          PYTHONPATH: _palomar-metadata-contract
+        run: |
+          python3 -m pip install PyYAML==6.0.3 jsonschema==4.26.0
+          python3 - <<'PYTHON'
+          import json
+          from pathlib import Path
+          import jsonschema
+          from scripts.submission_contract import load_formalization_metadata, normalized_provenance
+          data = load_formalization_metadata(Path('formalization.yaml'))
+          schema = json.loads(Path('_formalization-schema/schema/v0.4.schema.json').read_text())
+          jsonschema.validate(data, schema)
+          print(json.dumps(normalized_provenance(data), indent=2))
+          print('Palomar metadata and upstream v0.4 schema passed')
+          PYTHON
