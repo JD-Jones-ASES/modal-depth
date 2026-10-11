@@ -1,10 +1,10 @@
-# Modal-depth interpolation
+# Modal-depth interpolation and substitution
 
 A Lean 4 formalization of the depth-labeling criterion for interpolation in
 Sacchetti's modal logics. For each positive integer $`n`$, let
 
 ```math
-\mathsf{wGL}_n=\mathsf K+\{\Box(\Box^n A\to A)\to\Box A\}.
+\mathsf{wGL}_n=\mathsf{K}+\{\Box(\Box^n A\to A)\to\Box A\}.
 ```
 
 An occurrence carries its variable, polarity, and a label $`c(d)`$ of its modal
@@ -28,6 +28,16 @@ Ordinary uniform interpolation with source support is itself proved equivalent t
 `OrdinaryULI ∧ OrdinaryLyndon` in `sourceULI_iff`. Thus the first classification can
 also be stated using those two ordinary properties separately.
 
+The same condition exactly classifies **labelings that permit every substitution**.
+Choose an arbitrary replacement formula for each variable-label pair, and
+replace all original occurrences simultaneously. `depthSubstitution_iff`
+proves that every such substitution preserves theoremhood if and only if
+$`P_n(c)`$. This result has no interpolation premise and permits arbitrary
+target formulas, including formulas over an empty atom type. The source atom
+type must be nonempty. `phaseSubstitution_iff` gives the equivalent sharp
+condition for substitutions controlled by a successor map:
+$`\delta^{n+1}=\delta`$.
+
 The package does **not** prove the ordinary interpolation theorems from the
 literature. In particular, `classification_from_ordinary` retains explicit
 `OrdinaryULI` and `OrdinaryLyndon` hypotheses. Its conclusion identifies uniform
@@ -44,6 +54,11 @@ $`n+1`$ labels. Consequently:
 - Literal modal depth fails even unsigned Craig interpolation for every $`n>0`$.
 - The root label may coincide with any cycle label; no successor operation on the
   user's label type is assumed.
+
+This addresses the question of including depth in interpolation vocabulary
+raised in the conclusion of [Sierra Miranda and Studer's 2026 paper](https://arxiv.org/pdf/2607.06359v1).
+It determines all admissible depth labelings and supplies an explicit failed
+substitution whenever positive-depth periodicity is violated.
 
 Read [Proof.md](Proof.md) for the definitions, proof, and mathematical references.
 The ordinary inputs are [Sierra Miranda and Studer, Theorem 5.9](https://arxiv.org/pdf/2607.06359v1),
@@ -66,6 +81,6 @@ python3 scripts/check_negative_controls.py
 [Verification.md](Verification.md) describes the proof contracts, negative
 controls, and Linux kernel-replay scripts. The mathematical implementation is in
 `ModalDepth/`: `Basic`, `Interpolation`, `Phase`, `Renaming`, `Periodic`,
-`Obstruction`, `Transfer`, and `Craig`.
+`Obstruction`, `Transfer`, `Craig`, and `Substitution`.
 
 MIT license. Copyright (c) 2026 JD Jones.

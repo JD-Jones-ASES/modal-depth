@@ -13,6 +13,12 @@ ordinary interpolation properties on the right-hand side. The corollaries
 that remove those properties take them as explicit hypotheses. No declaration
 asserts that ordinary interpolation has been established for these logics.
 
+The substitution classification is unconditional: all formula-valued,
+depth-label substitutions preserve theoremhood exactly for positive-periodic
+labels. The phase-action classification and the explicit failure witness are
+also compared contracts. Their source atom type is nonempty; the target atom
+type is arbitrary.
+
 The Hilbert derivability relation contains propositional tautology instances,
 K, the weak Löb schema, modus ponens, and necessitation. The semantic
 obstruction uses natural-number worlds with accessibility to strictly smaller
@@ -29,8 +35,8 @@ python3 scripts/audit_axioms.py
 python3 scripts/check_negative_controls.py
 ```
 
-[The comparison configuration](comparator.json) lists 19 theorem contracts
-and 20 definition contracts. `ModalDepthChallenge.lean` is an independent
+[The comparison configuration](comparator.json) lists 22 theorem contracts
+and 22 definition contracts. `ModalDepthChallenge.lean` is an independent
 statement fixture with proof placeholders; `ModalDepthSolution.lean` imports
 the proved implementation and supplies every contract. The implementation
 never imports the challenge fixture. Placeholder axioms are forbidden in the
@@ -38,11 +44,17 @@ solution and supporting proofs.
 
 The axiom audit inspects the compiled environment, including nested
 namespaces, and checks all supporting theorems. The boundary controls prove
-concrete counterexamples and require five corrupted proof attempts to fail
+concrete counterexamples and require six corrupted proof attempts to fail
 with their intended diagnostics. They cover blind color erasure, an
-inadmissible phase action, a false phase identity, root/cycle collapse, and
-an incompatible residue modulus. These are targeted controls, not exhaustive
+inadmissible phase action, a false phase identity, root/cycle collapse,
+an incompatible residue modulus, and the wrong period for depth substitution.
+The accepted baseline also exercises substitution into an empty target alphabet.
+These are targeted controls, not exhaustive
 mutation testing.
+
+All Lean sources use explicit module visibility and expose the definitions
+needed by the public interfaces. The source check also enforces module headers,
+source size limits, and the absence of symbolic-link sources.
 
 ## Independent replay
 

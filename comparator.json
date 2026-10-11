@@ -20,7 +20,10 @@
     "ModalDepth.Contracts.decode_roundtrip",
     "ModalDepth.Contracts.encoding_support",
     "ModalDepth.Contracts.decoding_support",
-    "ModalDepth.Contracts.parity_with_inputs"
+    "ModalDepth.Contracts.parity_with_inputs",
+    "ModalDepth.Contracts.depth_substitution_classification",
+    "ModalDepth.Contracts.phase_substitution_classification",
+    "ModalDepth.Contracts.failed_depth_substitution"
   ],
   "definition_names": [
     "ModalDepth.Formula.boxes",
@@ -42,7 +45,9 @@
     "ModalDepth.PositivePeriodic",
     "ModalDepth.phaseTranslate",
     "ModalDepth.encode",
-    "ModalDepth.decode"
+    "ModalDepth.decode",
+    "ModalDepth.depthTranslate",
+    "ModalDepth.DepthSubstitution"
   ],
   "permitted_axioms": [
     "propext",

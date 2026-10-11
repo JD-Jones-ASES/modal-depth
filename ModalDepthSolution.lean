@@ -1,4 +1,8 @@
-import ModalDepth
+module
+
+public import ModalDepth
+
+@[expose] public section
 
 namespace ModalDepth.Contracts
 variable {α β Q C : Type}
@@ -94,5 +98,23 @@ theorem decoding_support (δ : Q → Q) (q : Q) (A : Formula (α × Q)) (s : Boo
 theorem parity_with_inputs (hu : OrdinaryULI 2 ℕ) (hl : OrdinaryLyndon 2 ℕ) :
     UniformSigned 2 (fun d => d % 2) ℕ := by
   exact (residue_classification_from_ordinary 2 2 (by decide) (by decide) hu hl).mpr (dvd_refl 2)
+
+theorem depth_substitution_classification (n : ℕ) (hn : 0 < n) (c : ℕ → C) [Nonempty α] :
+    DepthSubstitution n c α β ↔ PositivePeriodic n c := by
+  exact depthSubstitution_iff n hn c
+
+theorem phase_substitution_classification (n : ℕ) (hn : 0 < n) (δ : Q → Q) [Nonempty α] :
+    (∀ (f : Q → α → Formula β) (q : Q) (A : Formula α),
+      Provable n A → Provable n (phaseTranslate δ f q A)) ↔
+      ∀ q, δ^[n + 1] q = δ q := by
+  exact phaseSubstitution_iff n hn δ
+
+theorem failed_depth_substitution (n k : ℕ) (hn : 0 < n) (hk : 0 < k)
+    (c : ℕ → C) (hc : c (k + n) ≠ c k) (p : α) :
+    ∃ f : C → α → Formula β,
+      Provable n (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes (k + n))) ∧
+      ¬ Provable n (depthTranslate c f 0
+        (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes (k + n)))) := by
+  exact depthTranslate_failure hn hk hc p
 
 end ModalDepth.Contracts

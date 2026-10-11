@@ -88,7 +88,7 @@ def main() -> None:
         raise SystemExit(f"Missing challenge module: {challenge_path.relative_to(ROOT)}")
     paths: list[Path] = []
     for directory, subdirectories, files in os.walk(ROOT):
-        subdirectories[:] = [name for name in subdirectories if not name.startswith(".")]
+        subdirectories[:] = [name for name in subdirectories if name not in {".git", ".lake"}]
         paths.extend(Path(directory) / name for name in files
                      if name.endswith(".lean") and name != "lakefile.lean")
     paths.sort()
@@ -97,7 +97,17 @@ def main() -> None:
     errors: list[str] = []
     placeholders = 0
     for path in paths:
-        code = code_only(path.read_text(), path.relative_to(ROOT))
+        if path.is_symlink():
+            errors.append(f"{path.relative_to(ROOT)}: Lean source must not be a symbolic link")
+            continue
+        source = path.read_text()
+        code = code_only(source, path.relative_to(ROOT))
+        if not re.match(r"\s*module\b", code):
+            errors.append(f"{path.relative_to(ROOT)}: missing module header")
+        if len(source.splitlines()) > 10000:
+            errors.append(f"{path.relative_to(ROOT)}: exceeds 10000 physical lines")
+        if path == challenge_path and (len(source.splitlines()) > 1000 or path.stat().st_size > 100 * 1024):
+            errors.append(f"{path.relative_to(ROOT)}: exceeds the compact statement fixture limits")
         for match in TOKEN.finditer(code):
             token = match.group()
             if token not in FORBIDDEN:

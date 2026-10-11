@@ -1,8 +1,12 @@
-import ModalDepth.Phase
-import ModalDepth.Periodic
-import ModalDepth.Interpolation
-import ModalDepth.Obstruction
-import ModalDepth.Renaming
+module
+
+public import ModalDepth.Phase
+public import ModalDepth.Periodic
+public import ModalDepth.Interpolation
+public import ModalDepth.Obstruction
+public import ModalDepth.Renaming
+
+@[expose] public section
 
 namespace ModalDepth
 

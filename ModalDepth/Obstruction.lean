@@ -1,4 +1,8 @@
-import ModalDepth.Basic
+module
+
+public import ModalDepth.Basic
+
+@[expose] public section
 
 namespace ModalDepth
 

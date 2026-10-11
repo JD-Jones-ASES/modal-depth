@@ -2,7 +2,7 @@ name: Verify exact modal-depth commit
 
 on:
   push:
-    branches: [codex/formalization]
+    branches: ['codex/**']
   workflow_dispatch:
     inputs:
       expected_sha:

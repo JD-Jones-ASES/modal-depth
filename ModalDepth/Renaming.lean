@@ -1,5 +1,9 @@
-import ModalDepth.Phase
-import ModalDepth.Interpolation
+module
+
+public import ModalDepth.Phase
+public import ModalDepth.Interpolation
+
+@[expose] public section
 
 namespace ModalDepth
 

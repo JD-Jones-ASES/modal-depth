@@ -1,5 +1,10 @@
-import ModalDepth.Renaming
-import ModalDepth.Transfer
+module
+
+public import ModalDepth.Renaming
+public import ModalDepth.Transfer
+public import ModalDepth.Substitution
+
+@[expose] public section
 
 namespace ModalDepth.NegativeControls
 
@@ -60,5 +65,18 @@ theorem exact_depth_two_fails : ¬ UnsignedCraig 2 (fun d => d) ℕ := by
 theorem root_ne_positive_even :
     canonicalOrbit 2 (by decide) 0 ≠ canonicalOrbit 2 (by decide) 2 := by
   decide
+
+/-- The substitution obstruction still applies when no target atoms exist. -/
+theorem parity_GL_substitution_fails :
+    ¬ DepthSubstitution 1 (fun d => d % 2) ℕ Empty := by
+  intro h
+  have hp := (depthSubstitution_iff 1 (by decide) (fun d => d % 2)).mp h 1 (by decide)
+  norm_num at hp
+
+/-- Constants suffice as target formulas for admissible substitutions too. -/
+theorem parity_two_substitution :
+    DepthSubstitution 2 (fun d => d % 2) ℕ Empty := by
+  apply (depthSubstitution_iff 2 (by decide) (fun d => d % 2)).mpr
+  exact (positivePeriodic_mod_iff 2 2 (by decide) (by decide)).mpr (dvd_refl 2)
 
 end ModalDepth.NegativeControls

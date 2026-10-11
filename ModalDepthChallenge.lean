@@ -1,4 +1,8 @@
-import Mathlib.Tactic
+module
+
+public import Mathlib.Tactic
+
+@[expose] public section
 
 namespace ModalDepth
 
@@ -118,7 +122,7 @@ def OrdinaryCraig (n : ℕ) (α : Type) : Prop :=
     ∀ p, I.unsignedVocab p → A.unsignedVocab p ∧ B.unsignedVocab p
 
 
-variable {α β Q : Type}
+variable {α β Q C : Type}
 /-- A substitution whose atomic image depends on the phase of an occurrence. -/
 def phaseTranslate (δ : Q → Q) (f : Q → α → Formula β) (q : Q) :
     Formula α → Formula β
@@ -137,6 +141,17 @@ noncomputable def decode (δ : Q → Q) (q : Q) (A : Formula (α × Q)) : Formul
   classical
   exact phaseTranslate δ (fun q p => if p.2 = q then .atom p.1 else .bot) q A
 
+
+/-- Replace atoms according to their depth label, beginning at a given depth. -/
+def depthTranslate (c : ℕ → C) (f : C → α → Formula β) (offset : ℕ) :
+    Formula α → Formula β :=
+  phaseTranslate Nat.succ (fun d p => f (c d) p) offset
+
+/-- Every formula-valued replacement depending on the atom and its depth label
+preserves theorems. Depth is measured in the source formula. -/
+def DepthSubstitution (n : ℕ) (c : ℕ → C) (α β : Type) : Prop :=
+  ∀ (f : C → α → Formula β) (A : Formula α),
+    Provable n A → Provable n (depthTranslate c f 0 A)
 
 end ModalDepth
 
@@ -222,6 +237,24 @@ theorem decoding_support (δ : Q → Q) (q : Q) (A : Formula (α × Q)) (s : Boo
 
 theorem parity_with_inputs (hu : OrdinaryULI 2 ℕ) (hl : OrdinaryLyndon 2 ℕ) :
     UniformSigned 2 (fun d => d % 2) ℕ := by
+  sorry
+
+theorem depth_substitution_classification (n : ℕ) (hn : 0 < n) (c : ℕ → C) [Nonempty α] :
+    DepthSubstitution n c α β ↔ PositivePeriodic n c := by
+  sorry
+
+theorem phase_substitution_classification (n : ℕ) (hn : 0 < n) (δ : Q → Q) [Nonempty α] :
+    (∀ (f : Q → α → Formula β) (q : Q) (A : Formula α),
+      Provable n A → Provable n (phaseTranslate δ f q A)) ↔
+      ∀ q, δ^[n + 1] q = δ q := by
+  sorry
+
+theorem failed_depth_substitution (n k : ℕ) (hn : 0 < n) (hk : 0 < k)
+    (c : ℕ → C) (hc : c (k + n) ≠ c k) (p : α) :
+    ∃ f : C → α → Formula β,
+      Provable n (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes (k + n))) ∧
+      ¬ Provable n (depthTranslate c f 0
+        (.imp ((Formula.atom p).boxes k) ((Formula.atom p).boxes (k + n)))) := by
   sorry
 
 end ModalDepth.Contracts

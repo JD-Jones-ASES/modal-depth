@@ -11,16 +11,24 @@ The Hilbert presentation in `Basic.lean` includes all classical propositional
 tautology instances, the distribution axiom, modus ponens, and necessitation.
 Atoms are natural numbers in the main classification theorems.
 
+Sierra Miranda and Studer propose investigating depth as part of the shared
+vocabulary in interpolation in the conclusion of their
+[2026 paper](https://arxiv.org/pdf/2607.06359v1). The classification below
+separates literal depth, which cannot be retained, from the precise periodic
+depth distinctions compatible with interpolation. The same criterion also
+characterizes the depth labelings for which every associated substitution
+preserves theoremhood.
+
 ## Occurrences and interpolation properties
 
-An atomic occurrence has polarity $`s\in\{+,-\}`$ and modal depth $`d\in\mathbb N`$.
+An atomic occurrence has polarity $`s\in\{+,-\}`$ and modal depth $`d\in\mathbb{N}`$.
 Passing into an implication's antecedent reverses polarity; passing through a box
-increases depth by one. Fix an arbitrary type $`C`$ and map $`c:\mathbb N\to C`$.
+increases depth by one. Fix an arbitrary type $`C`$ and map $`c:\mathbb{N}\to C`$.
 Write $`S_c(A)`$ for the triples $`(s,p,c(d))`$ realized by occurrences in $`A`$.
 Unsigned support forgets $`s`$ while retaining the pair $`(p,c(d))`$.
 
 Uniform signed interpolation requires that for every formula $`A`$ and allowed set
-$`W\subseteq\{+,-\}\times\mathbb N\times C`$, there is a formula $`I`$ such that
+$`W\subseteq\{+,-\}\times\mathbb{N}\times C`$, there is a formula $`I`$ such that
 
 ```math
 S_c(I)\subseteq S_c(A)\cap W,\qquad L_n\vdash A\to I,
@@ -46,11 +54,15 @@ P_n(c)\quad\Longleftrightarrow\quad
 The main structural theorems are
 
 ```math
-\begin{aligned}
-\operatorname{UniformSigned}_n(c)&\iff U_n\land P_n(c),\\
-\operatorname{SignedCraig}_n(c)&\iff L_n^{\mathrm{int}}\land P_n(c),\\
-\operatorname{UnsignedCraig}_n(c)&\iff C_n^{\mathrm{int}}\land P_n(c).
-\end{aligned}
+\mathrm{UniformSigned}_n(c)\Longleftrightarrow U_n\land P_n(c).
+```
+
+```math
+\mathrm{SignedCraig}_n(c)\Longleftrightarrow L_n^{\mathrm{int}}\land P_n(c).
+```
+
+```math
+\mathrm{UnsignedCraig}_n(c)\Longleftrightarrow C_n^{\mathrm{int}}\land P_n(c).
 ```
 
 These are `uniformSigned_iff`, `signedCraig_iff`, and `unsignedCraig_iff`.
@@ -108,8 +120,8 @@ interpolation and forgets the polarities when matching support.
 
 This proves `uniformSigned_phase`, `signedCraig_phase`, and
 `unsignedCraig_phase`. Their ordinary hypotheses concern atoms in
-$`\mathbb N\times Q`$. For the finite phase type below, an encoding into
-$`\mathbb N`$ with a left inverse transfers the corresponding ordinary property.
+$`\mathbb{N}\times Q`$. For the finite phase type below, an encoding into
+$`\mathbb{N}`$ with a left inverse transfers the corresponding ordinary property.
 The renaming proofs transport both derivability and occurrence support.
 
 ## The canonical phase space and arbitrary labels
@@ -117,7 +129,7 @@ The renaming proofs transport both derivability and occurrence support.
 Use a separate root $`\ast`$ followed by a cycle of length $`n`$:
 
 ```math
-Q_n=\{\ast\}\sqcup\mathbb Z/n\mathbb Z,\qquad
+Q_n=\{\ast\}\sqcup\mathbb{Z}/n\mathbb{Z},\qquad
 \delta(\ast)=0,\qquad\delta(i)=i+1\pmod n.
 ```
 
@@ -176,6 +188,48 @@ Consequently unsigned Craig interpolation forces $`P_n(c)`$, with no ordinary
 interpolation assumption. Signed Craig and uniform signed interpolation imply
 the unsigned property, so the same obstruction proves all three necessary
 directions. `unsignedCraig_periodic` formalizes this argument.
+
+## Exact substitution criterion
+
+For each label $`z`$ and source atom $`p`$, choose an arbitrary target formula
+$`f_z(p)`$. Let $`T_{c,f}`$ replace each original occurrence of $`p`$ at depth
+$`d`$ by $`f_{c(d)}(p)`$, commuting with the original connectives. Substitution
+is simultaneous: it does not recurse into the inserted formulas. The source
+atom type is nonempty; the target atom type may even be empty.
+
+The theorem `depthSubstitution_iff` states
+
+```math
+\bigl(\forall f,A,\ L_n\vdash A\ \Longrightarrow\ L_n\vdash T_{c,f}(A)\bigr)
+\quad\Longleftrightarrow\quad P_n(c).
+```
+
+This equivalence has no ordinary interpolation hypothesis. For sufficiency,
+factor $`c=h\circ\gamma`$ through the canonical phase space. Substitution with
+atomic images $`f_{h(q)}(p)`$ then coincides with $`T_{c,f}`$ at the root,
+and the phase-preservation theorem applies.
+
+For necessity, take $`k>0`$ with $`c(k+n)\ne c(k)`$. Substitute
+$`\top`$ for atoms with label $`c(k)`$ and $`\bot`$ for atoms with all other
+labels in the derivable formula $`\Box^k p\to\Box^{k+n}p`$. Its image is
+$`\Box^k\top\to\Box^{k+n}\bot`$. At world $`k+n`$ on the strict descending
+chain, the antecedent is true and the consequent is false. Soundness therefore
+refutes theoremhood of the image. `depthTranslate_failure` gives this explicit
+family of counterexamples.
+
+The phase identity is sharp as well. For any successor map $`\delta:Q\to Q`$,
+`phaseSubstitution_iff` proves
+
+```math
+\bigl(\forall f,q,A,\ L_n\vdash A\ \Longrightarrow\ L_n\vdash T_q(A)\bigr)
+\quad\Longleftrightarrow\quad
+\forall q,\ \delta^{n+1}(q)=\delta(q).
+```
+
+Necessity follows by applying the depth criterion to each orbit and using
+$`k=1`$; sufficiency is `phaseTranslate_provable`. Thus the identity used by
+the interpolation transfer is also the exact condition for unrestricted
+formula-valued substitution to preserve the logic.
 
 ## Consequences and relation to ordinary interpolation
 

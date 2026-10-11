@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compile boundary witnesses, then require five corrupted proofs to fail.
+"""Compile boundary witnesses, then require corrupted proofs to fail.
 
 Generated Lean sources and compiler logs stay in .lake/verification. A missing
 import, executable failure, or an unexpected diagnostic does not count as a
@@ -31,9 +31,21 @@ example : canonicalOrbit 2 (by decide) 0 ≠ canonicalOrbit 2 (by decide) 2 :=
   root_ne_positive_even
 example : decode Bool.not false wrongColor = .bot :=
   selective_decoder_removes_wrong_color
+example : ¬ DepthSubstitution 1 (fun d => d % 2) ℕ Empty :=
+  parity_GL_substitution_fails
+example : DepthSubstitution 2 (fun d => d % 2) ℕ Empty :=
+  parity_two_substitution
 """
 
 CONTROLS = [
+    (
+        "wrong_substitution_period",
+        "Replace the valid period-two substitution result with a period-one claim.",
+        """example : DepthSubstitution 1 (fun d => d % 2) ℕ Empty := by
+  exact parity_two_substitution
+""",
+        "Type mismatch",
+    ),
     (
         "blind_decoder",
         "Replace selective decoding by blind color erasure in its support theorem.",
